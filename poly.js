@@ -201,7 +201,7 @@ function side(a,b,p){
 
 function drawBackground(context){
     var background = context.createRadialGradient(w / 2, h / 2, 0.10 * h, w / 2, h / 2, 0.85 * h);
-    var colors = palette('#76352d');
+    var colors = palette('#5fe385');
 
     background.addColorStop(0, '#e0e0e0');
 
