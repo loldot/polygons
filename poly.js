@@ -3,6 +3,18 @@ const colorRegex = /[a-fA-F0-9]{6}/;
 const w = window.innerWidth;
 const h = window.innerHeight;
 
+let canvas = document
+    .querySelector('#poly');
+
+canvas.width = w;
+canvas.height = h;
+
+let context = canvas.getContext('2d');
+let triangles = createPolygons(125);
+
+drawBackground(context, '#34c3eb');
+drawTriangulation(context, triangles);
+
 function hexToRgb(color){
     let val = parseInt(color.match(colorRegex)[0], 16);
     return [val >> 16, (val >> 8) & 0xff, val & 0x0000ff]
@@ -24,6 +36,7 @@ function palette(primary){
     let [r,g,b] = hexToRgb(primary)
     
     return [
+        '#e0e0e0',
         rgbToHex(clamp(r * 1.25), clamp(g * 1.25), clamp(b * 1.25)),
         rgbToHex(r,g,b),
         rgbToHex(clamp(r * 0.6), g, clamp(b * 1.63))
@@ -40,48 +53,6 @@ function createPolygons(n = 10){
     }
 
     return bowyerWatson(points);
-}
-
-function drawTriangulation(ctx, triangles){
-    triangles.forEach(t => drawTriangle(ctx, t));
-}
-
-function drawTriangle(context, t){
-    let [[ax,ay],[bx,by],[cx,cy]] = t;
-    
-    context.strokeStyle= '#303030';
-    
-    // var background = context.createRadialGradient(ax, ay, 15, ax, ay, 150);
-    // var colors = palette('#c35667');
-
-    // background.addColorStop(0, colors[0]);
-    // background.addColorStop(0.45, colors[1]);
-    // background.addColorStop(1, colors[2]);
-
-    let x = (ax + bx + cx) / 3;
-    let y = (ay + by + cy) / 3;
-
-    var [r,g,b] = context.getImageData(x, y, 1, 1).data; 
-    context.fillStyle = rgbToHex(r,g,b);
-
-    context.beginPath();
-    context.moveTo(ax, ay);
-    context.lineTo(bx, by);
-    context.lineTo(cx, cy);
-    context.closePath();
-    context.fill();
-    context.stroke();
-}
-
-function drawPoints(points){
-    let context = canvas.getContext('2d');
-
-    for (const [x,y] of points) {
-        context.moveTo(x,y);
-        context.strokeStyle = '#ffffff';
-        context.arc(x,y,2,0,2*Math.PI);
-        context.stroke();    
-    }    
 }
 
 function bowyerWatson(points){
@@ -199,31 +170,54 @@ function side(a,b,p){
     return (cp > 0) - (cp < 0);
 }
 
-function drawBackground(context){
+function drawBackground(context, color){
     var background = context.createRadialGradient(w / 2, h / 2, 0.10 * h, w / 2, h / 2, 0.85 * h);
-    var colors = palette('#5fe385');
 
-    background.addColorStop(0, '#e0e0e0');
+    var stops = [0, 0.2, 0.45, 1];
+    var colors = palette(color);
 
-    background.addColorStop(0.2, colors[0]);
-    background.addColorStop(0.45, colors[1]);
-    background.addColorStop(1, colors[2]);
+    for (let i = 0; i < stops.length; i++) {
+        background.addColorStop(stops[i], colors[i]);
+    }
 
     context.fillStyle = background;
     context.fillRect(0, 0, w, h); 
 }
 
-let canvas = document
-    .querySelector('#poly');
+function drawTriangulation(ctx, triangles){
+    triangles.forEach(t => drawTriangle(ctx, t));
+}
 
-canvas.width = w;
-canvas.height = h;
+function drawTriangle(context, t){
+    let [[ax,ay],[bx,by],[cx,cy]] = t;
+    
+    context.strokeStyle= '#303030';
 
-let context = canvas.getContext('2d');
-let triangles = createPolygons(120);
+    let x = (ax + bx + cx) / 3;
+    let y = (ay + by + cy) / 3;
 
-drawBackground(context);
-drawTriangulation(context, triangles);
+    var [r,g,b] = context.getImageData(x, y, 1, 1).data; 
+    context.fillStyle = rgbToHex(r,g,b);
+
+    context.beginPath();
+    context.moveTo(ax, ay);
+    context.lineTo(bx, by);
+    context.lineTo(cx, cy);
+    context.closePath();
+    context.fill();
+    context.stroke();
+}
+
+function drawPoints(points){
+    let context = canvas.getContext('2d');
+
+    for (const [x,y] of points) {
+        context.moveTo(x,y);
+        context.strokeStyle = '#ffffff';
+        context.arc(x,y,2,0,2*Math.PI);
+        context.stroke();    
+    }    
+}
 
 function test(){
     assertTrue(isSameEdge([[3,4], [-1,1]], [[3,4], [-1,1]]), 'AB should equal AB');
@@ -241,8 +235,6 @@ function test(){
     let bc = [[3,2], [2,1]];
 
     assertEqual([ab,ac,bc], edges([a,b,c]), 'edges');
-
-    
 
     assertTrue(isSameTriangle([a,b,c],[a,b,c]), 'ABC should equal ABC');
     assertTrue(isSameTriangle([b,c,a],[a,b,c]), 'BCA should equal ABC');
