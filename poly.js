@@ -31,6 +31,9 @@ function draw(color, count){
     
     drawBackground(context, color);
     drawTriangulation(context, triangles);
+
+    let dataUri = canvas.toDataURL("image/png");
+    document.getElementById('download-link').href = dataUri;
 }
 
 function hexToRgb(color){
@@ -39,7 +42,11 @@ function hexToRgb(color){
 }
 
 function rgbToHex(r,g,b){
-    return '#' + ((r << 16) | (g << 8 ) | b).toString(16);
+    var numericValue =((r << 16) | (g << 8 ) | b).toString(16);
+    while (numericValue.length < 6) {
+        numericValue = '0' + numericValue;
+    }
+    return '#' + numericValue;
 }
 
 function clamp(x, min = 0, max = 255)
@@ -265,6 +272,8 @@ function test(){
 
     assertTrue(overlaps([a,b,[-1,-1]], [b,a,[1,1]]), 'triangles on same axis overlaps');
     assertTrue(overlaps([a,[2,-1],[-1,-1]], [[1,2],a,[1,1]]), 'triangles with same point overlaps');
+
+    assertEqual(['#e0e0e0','#00ffff','#00fffc','#00ffff'], palette('#00FFFC'),'color with leading 0 should not fail');
 }
 
 function assertTrue(actual, description){
