@@ -10,9 +10,23 @@
             margin: 0;
             padding: 0;
         }
+        #customize {
+            position: absolute;
+            top:0;
+            left: 0;
+            padding: 1em;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
     </style>
 </head>
 <body>
+    <form id="customize">
+        <label>Color:</label>
+        <input type="color" name="color" value="#34c3eb" />
+        <label>Vertice count:</label>
+        <input type="number" name="count" value="120" />
+        <input type="submit" value="ok" />
+    </form>
     <canvas id="poly" ></canvas>
 </body>
 <script src="./poly.js"></script>

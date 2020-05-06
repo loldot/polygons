@@ -9,11 +9,29 @@ let canvas = document
 canvas.width = w;
 canvas.height = h;
 
-let context = canvas.getContext('2d');
-let triangles = createPolygons(125);
+this.document.forms['customize'].addEventListener('submit', function(e){
+    e.preventDefault();
+    
+    let color = e.target.elements['color'].value;
+    let count = e.target.elements['count'].value;
 
-drawBackground(context, '#34c3eb');
-drawTriangulation(context, triangles);
+    draw(color, count);
+});
+
+this.document.addEventListener('DOMContentLoaded', function(){
+    let color = document.forms['customize'].elements['color'].value;
+    let count = document.forms['customize'].elements['count'].value;
+
+    draw(color, count);
+});
+
+function draw(color, count){
+    let context = canvas.getContext('2d');
+    let triangles = createPolygons(count);
+    
+    drawBackground(context, color);
+    drawTriangulation(context, triangles);
+}
 
 function hexToRgb(color){
     let val = parseInt(color.match(colorRegex)[0], 16);
