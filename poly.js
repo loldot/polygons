@@ -51,7 +51,7 @@ function render(triangles){
 
 function hexToRgb(color){
     let val = parseInt(color.match(colorRegex)[0], 16);
-    return [val >> 16, (val >> 8) & 0xff, val & 0x0000ff]
+    return [val & 0xff0000, val & 0x00ff00, val & 0x0000ff]
 }
 
 function rgbToHex(r,g,b){
